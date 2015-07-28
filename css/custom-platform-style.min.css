@@ -1,0 +1,78 @@
+
+.footer-links>li>a{
+	font-size:12px
+}
+
+#footer p{
+	font-size:13px;
+	color:#909090
+}
+
+#footer a{
+	font-size:12px;
+	color:#9aa4af;
+	text-decoration:none;
+	font-weight:700
+}
+
+#footer a:active,#footer a:hover{
+	color:#28a5d3;
+	background:0
+}
+
+#footer ul>li{
+	font-size:13px;
+	color:#909090;
+	text-decoration:none
+}
+
+#footer ul.socialConnect>li{
+	font-size:13px;
+	color:#909090;
+	display:inline-block;
+	text-decoration:none
+}
+
+
+#footer{
+	background-image:url('/jq/images/platform/light-back.png');
+	background-repeat:repeat;
+	position:relative;
+	bottom:0
+}
+
+
+.verticalLine{
+	border-left:2px solid #656565;
+	height:108px;
+	margin-left:275px;
+	margin-top:-110px
+}
+
+.footer-links{
+	font-size:14px
+}
+
+#content{
+	margin-top:-4%
+}
+
+.ca-sidebar-list{
+	background-color:#f5f5f5;
+	border:0 solid #ddd;
+	display:block;
+	padding:16px 12px;
+	position:relative;
+	margin-bottom:0;
+	font-size:16px
+}
+
+.ca-sidebar{
+	background-color:#f5f5f5;
+	border-radius:4px 4px 4px 4px;
+	box-shadow:0 1px 1px rgba(0,0,0,0.05) inset;
+	margin-bottom:20px;
+	min-height:20px;
+	margin-top:15px;
+	width:200px
+}

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<!-------------------------------------------------------------
+ Name:        Explore Holiday Packages
+ Purpose:     TO explore the world
+ Author:      sushanth
+ Created:     18-08-2013
+ Modified:    15-07-2015
+ Copyright:  (c) Explore Holiday Packages
+--------------------------------------------------------------->
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="Exploring the world is our passion, and we want to share the joys of discovery with you through the diversity of the resorts we offer.">
+    <meta name="author" content="Sushanth">
+    <meta http-equiv="refresh" content="600">
+    <meta name="keywords" content="holiday,vacation,resort,club membership">
+    <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.min.css">    
+    <link rel="stylesheet" type="text/css" media="screen" href="css/docs.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="css/style.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="css/pin.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="css/community.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="css/custom-platform-style.min.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="http://fortawesome.github.io/Font-Awesome/assets/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css">
+    <script type="text/javascript" src="javascripts/jquery.min.js"></script>
+    <script type="text/javascript" src="javascripts/d3.v3.min_b.js"></script>
+    <link rel="shortcut icon" href="/./images/images.jpg">
+ <script type="text/javascript">var switchTo5x=true;</script>
+    <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
+    <script type="text/javascript">stLight.options({publisher: "cc30e3a2-dbb5-4545-ac40-64ca85fe3e37", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script> 	
+    <title>Explore Holiday Packages</title>
+    </head>
+    <body class="theme-beige" >
+   <!-- HEADER -->
+    <div id="header_wrap" class="outer info">
+        <header class="inner">	
+            <h1 align="left" id="project_title">Explore Holiday Packages</h1>
+            <p id="project_title_p">Exploring the world is our passion, and we want to share the joys of discovery with you through the diversity of the resorts we offer.</p>
+        </header>
+    </div>
+    <br/><br/>
+    <div class="inner head">
+    <div class="side_bar" id="nav" style="width:15%;float:left;display:inline-block">
+        <div class="menu1-container"></div>
+        <div class="menu2-container">
+            <input type="text" class="menu2-search" />
+            <li class="all"><a href="" class="displayName">all</a></li>
+        </div>
+    </div>
+    <div id="list" style="width:75%;float:right;display:inline-block">
+        <div class="menu3-container"></div>
+    </div>
+    </div>
+    <a href="javascript:" id="return-to-top"><i class="icon-chevron-up"></i></a>
+<script type="text/javascript">
+
+    $(window).scroll(function() {
+        if ($(this).scrollTop() >= 50) {        
+            $('#return-to-top').fadeIn(200);    
+        } else {
+            $('#return-to-top').fadeOut(200);   
+        }
+    });
+    $('#return-to-top').click(function() {     
+        $('body,html').animate({
+            scrollTop : 0             
+        }, 500);
+    });
+    
+    var splitChar = '; ';
+    var json;
+
+    var data1 = {
+        class_name :"displayName",
+        href: function(d, i){return '#'+ d.dimension+'=all';},
+        html: function(d, i){ return d.displayName;}
+    };
+
+    var data2 = {
+        class_name :"displayName",
+        href: function(d, i){ return '#'+ d.dimension+'='+d.key; },
+        html: function(d, i){ return d.key+' <span class="value">'+ d.value+'</span>';}
+    };
+
+    var data3 = {
+        class_name :"demo thumbnail pull-left",
+        //href: function(d, i){ return d.url;},
+        html: function(d, i){
+            var content ='';
+            if(d['image_0']) content += "<img width='192' height='128'  src="+d['image_0']+" id='grey_scale'  class='visual-img '/>";
+            content += "<h3 align='left'>"+d.Resort_Name.slice(0,22)+"</h3>";
+            if(d.Resort_Details)content += "<p>"+d.About.slice(0,150)+"<p/>";
+			if(d.Resort_Details)content += "<a href='detail_view.html#Resort_Name="+d.Resort_Name+"' class="+d.Resort_Details+"> more.... <a/>";
+			
+			
+            return content;}
+    };
+
+    function getDocHeight() {
+        var doc = document;
+        return Math.max(
+            doc.body.scrollHeight, doc.documentElement.scrollHeight,
+            doc.body.offsetHeight, doc.documentElement.offsetHeight,
+            doc.body.clientHeight, doc.documentElement.clientHeight
+        );
+    }
+
+    var thumbSize = 250;
+    var menu3Width = parseInt(d3.select('#list').style('width'));
+    var numInOneScreen = Math.ceil(menu3Width / thumbSize) * Math.ceil(getDocHeight() / thumbSize);
+    var numInView = numInOneScreen;
+
+    d3.csv('detail_data_all.csv', function(error, _json){
+        json = _json;
+        buildList(dataTransformMenu1(), '.menu1-container', data1);
+        buildList(dataTransformMenu2('Country'), '.menu2-container', data2);
+        processLocationHash();
+    });
+
+    function dataTransformMenu1(){
+        //TODO: change in spreadsheet
+        var dimensionsMap = {Country: 'Country', City: 'City'};
+        return d3.keys(dimensionsMap).map(function(d, i){return {dimension: d, displayName: dimensionsMap[d]};});
+    }
+
+    function dataTransformMenu2(dimension, filter){
+        var splitted = d3.merge(json.map(function(d, i){
+            return splitter(d[dimension]);
+        }));
+        var filtered = (filter) ? splitted.filter(function(d, i){ return d.toLowerCase().indexOf(filter.toLowerCase()) != -1; }) : splitted;
+        var unemptied = filtered.map(function(d, i){return (d == '') ? 'untagged' : d;});
+        var grouped = groupCount(unemptied);
+        var prepared = d3.entries(grouped).map(function(d, i){
+                d.dimension = dimension;
+                return d;
+            });
+        var sorted = prepared.sort(function(a, b){return b.value - a.value});
+        return sorted;
+    }
+
+    function splitter(data){
+        return (data.indexOf(splitChar) !== -1) ? data.split(splitChar) : data;
+    }
+
+    function groupCount(arr) {
+        var uniques = {}, val;
+        var dups = {};
+        for (var i = 0, len = arr.length; i < len; i++) {
+            val = arr[i];
+            if (val in uniques) {
+                uniques[val]++;
+                dups[val] = uniques[val];
+            } else uniques[val] = 1;
+        }
+        return(uniques);
+    }
+
+    var cachedData;
+    function dataTransformMenu3(dimension, value){
+        var filtered = json.filter(function(d, i){
+            var splitted = splitter(d[dimension]);
+            if (value == 'all') return true;
+            else if(value == 'untagged') return (splitted == '');
+            //TODO: use the grouped data instead
+            else if(splitted.indexOf(value) >= 0) return true;
+            else return false;
+        });
+        var sorted = filtered.sort(function(a, b){
+                return (a.thumbnail == '') - (b.thumbnail == '');
+            });
+        cachedData = sorted;
+        return sorted;
+    }
+
+    function dataView(data, num){
+        return data.slice(0, num);
+    }
+
+    function buildList(data, containerSelector, content){
+        d3.select(containerSelector).selectAll("li.entry").remove();
+        updateList(data, containerSelector, content);
+    }
+
+    function updateList(data, containerSelector, content){
+        var entries = d3.select(containerSelector)
+            .selectAll("li.entry")
+            .data(data)
+            .enter().append("li")
+            .attr('class', 'entry')
+            .append('a')
+            .attr('href', content.href)
+            .attr('class',content.class_name)
+            .html(content.html);
+    }
+
+    d3.select('.menu2-search')
+        .on('change', function(d, i){ filterList(this.value); })
+        .on('keyup', function(d, i){ filterList(this.value); });
+    d3.select('body').on('mouseover', function(){
+            if (d3.event.target.nodeName == 'A') d3.select('.menu2-search').node().blur();
+        });
+
+    function filterList(value){
+        var dimension = window.location.hash.substring(1).split('=')[0] || 'Country';
+        buildList(dataTransformMenu2(dimension, value), '.menu2-container', data2);
+    }
+
+    function processLocationHash(){
+        d3.select('#list').node().scrollTop = 0;
+        numInView = numInOneScreen;
+        if(window.location.hash) {
+            var hash = window.location.hash.substring(1);
+            var hashSplit = hash.split('=');
+            if(hashSplit[1] == 'all') buildList(dataTransformMenu2(hashSplit[0]), '.menu2-container', data2);
+            buildList(dataView(dataTransformMenu3(hashSplit[0], hashSplit[1]), numInView), '.menu3-container', data3);
+        }else{
+            buildList(dataView(dataTransformMenu3('City', 'all'), numInView), '.menu3-container', data3);
+        }
+    }
+
+    d3.select(window).on('hashchange', function () {
+        processLocationHash();
+    });
+
+    d3.select('#list').on('scroll', function(d, i){
+        if(this.scrollHeight - this.scrollTop <= getDocHeight()){
+            numInView += numInOneScreen;
+            updateList(dataView(cachedData, numInView), '.menu3-container', data3);
+        }
+    });
+
+</script>
+<footer>
+<div class="row">
+	<nav class="navbar" role="navigation">
+		<div class="container">
+			<!-- logo -->
+				<div class="col-sm-2 col-lg-2">
+				</div>
+		</div>
+	</nav>
+        <div class="copyright text-center">
+			@ 2015 Explore Holiday Packages Private Limited. All rights reserved
+		</div>
+</div>
+</footer>   
+</body>
+</html>
